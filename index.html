@@ -1,53 +1,341 @@
-<!DOCTYPE html>
+h<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ফেসবুক ভিডিও ডাউনলোডার</title>
-    <!-- স্টাইলশীট লিংক -->
-    <link rel="stylesheet" href="style.css">
-    <!-- Font Awesome আইকন এর জন্য -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* General Styles */
+        :root {
+            --primary-color: #1877F2; /* Facebook Blue */
+            --secondary-color: #42B72A; /* Green for success */
+            --light-gray: #f0f2f5;
+            --dark-gray: #65676b;
+            --text-color: #1c1e21;
+            --white-color: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--white-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+        }
+
+        /* Downloader Form */
+        .downloader-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        #video-url {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #video-url:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.2);
+        }
+
+        #download-btn {
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--white-color);
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #download-btn:hover {
+            background-color: #166fe5;
+        }
+
+        /* Loading Spinner */
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .spinner {
+            border: 6px solid var(--light-gray);
+            border-top: 6px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Result Section */
+        #result {
+            display: none;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            background-color: #fafafa;
+        }
+        
+        .video-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .video-thumbnail {
+            width: 160px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+        }
+        
+        .video-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .download-links {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        .download-links a {
+            display: inline-block;
+            text-decoration: none;
+            color: var(--white-color);
+            background-color: var(--secondary-color);
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        .download-links a:hover {
+            background-color: #3ca327;
+            transform: translateY(-2px);
+        }
+
+        /* Instructions Section */
+        .instructions {
+            margin-top: 3rem;
+        }
+
+        .instructions h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .instructions ol {
+            list-style-type: none;
+            padding-left: 0;
+            counter-reset: step-counter;
+        }
+
+        .instructions li {
+            position: relative;
+            padding: 10px 10px 10px 50px;
+            margin-bottom: 10px;
+            background: var(--white-color);
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+        }
+
+        .instructions li::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: var(--primary-color);
+            color: var(--white-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            header h1 {
+                font-size: 2rem;
+            }
+            .downloader-form {
+                flex-direction: column;
+            }
+            .video-info {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1><i class="fab fa-facebook"></i> ফেসবুক ভিডিও ডাউনলোডার</h1>
-            <p>আপনার পছন্দের ফেসবুক ভিডিও ডাউনলোড করুন সহজেই।</p>
+            <h1>ফেসবুক ভিডিও ডাউনলোডার</h1>
+            <p>যেকোনো ফেসবুক ভিডিওর লিংক এখানে পেস্ট করুন এবং সহজেই ডাউনলোড করুন।</p>
         </header>
 
         <main>
-            <form id="download-form">
-                <div class="input-group">
-                    <input type="url" id="video-url" placeholder="এখানে ফেসবুক ভিডিওর লিংক পেস্ট করুন..." required>
-                    <button type="submit" id="download-btn">
-                        <span class="btn-text">ডাউনলোড</span>
-                        <span class="loader" style="display: none;"></span>
-                    </button>
-                </div>
+            <form class="downloader-form" id="download-form">
+                <input type="url" id="video-url" placeholder="এখানে ফেসবুক ভিডিওর লিংক পেস্ট করুন..." required>
+                <button type="submit" id="download-btn">ডাউনলোড</button>
             </form>
 
-            <!-- এখানে ডাউনলোডের ফলাফল দেখানো হবে -->
-            <div id="result" class="hidden">
+            <!-- Loading Spinner -->
+            <div id="loading">
+                <div class="spinner"></div>
+                <p>লিংক প্রসেস করা হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...</p>
+            </div>
+
+            <!-- Result Section -->
+            <div id="result">
                 <div class="video-info">
-                    <img id="video-thumbnail" src="https://via.placeholder.com/150" alt="Video Thumbnail">
-                    <h3 id="video-title">ভিডিওর টাইটেল এখানে আসবে...</h3>
+                    <img id="video-thumbnail" src="https://via.placeholder.com/160x90" alt="Video Thumbnail" class="video-thumbnail">
+                    <div>
+                        <h3 id="video-title" class="video-title">ভিডিওর টাইটেল এখানে দেখা যাবে</h3>
+                    </div>
                 </div>
                 <div class="download-links">
-                    <p>ডাউনলোড অপশন:</p>
-                    <a href="#" class="download-link" download>
-                        <i class="fas fa-download"></i> HD কোয়ালিটি (720p)
-                    </a>
-                    <a href="#" class="download-link" download>
-                        <i class="fas fa-download"></i> SD কোয়ালিটি (360p)
-                    </a>
+                    <a href="#" id="download-sd" download>Download SD (360p)</a>
+                    <a href="#" id="download-hd" download>Download HD (720p)</a>
                 </div>
             </div>
         </main>
+
+        <section class="instructions">
+            <h2>কিভাবে ব্যবহার করবেন?</h2>
+            <ol>
+                <li>ফেসবুকে আপনার পছন্দের ভিডিওটি খুঁজুন।</li>
+                <li>ভিডিওর নিচে থাকা 'Share' বাটনে ক্লিক করুন এবং 'Copy Link' অপশনটি বেছে নিন।</li>
+                <li>কপি করা লিংকটি উপরের বক্সে পেস্ট করুন।</li>
+                <li>'ডাউনলোড' বাটনে ক্লিক করুন এবং কিছুক্ষণ অপেক্ষা করুন।</li>
+                <li>আপনার পছন্দের কোয়ালিটির (SD/HD) ডাউনলোড বাটনে ক্লিক করে ভিডিওটি সেভ করুন।</li>
+            </ol>
+        </section>
     </div>
 
-    <!-- জাভাস্ক্রিপ্ট ফাইল লিংক -->
-    <script src="script.js"></script>
+    <footer>
+        <p>© 2024 আপনার ওয়েবসাইটের নাম। সর্বস্বত্ব সংরক্ষিত।</p>
+        <p><strong>Disclaimer:</strong> এই ওয়েবসাইটটি শুধুমাত্র ব্যক্তিগত ব্যবহারের জন্য। দয়া করে কপিরাইট আইন মেনে চলুন এবং অন্যের অনুমতি ছাড়া কন্টেন্ট ডাউনলোড বা বিতরণ থেকে বিরত থাকুন।</p>
+    </footer>
+
+    <script>
+        const downloadForm = document.getElementById('download-form');
+        const videoUrlInput = document.getElementById('video-url');
+        const loadingDiv = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+
+        // এই কোডটি শুধুমাত্র ফ্রন্টএন্ড ডেমোর জন্য।
+        // বাস্তব জীবনে, আপনাকে একটি ব্যাকএন্ড তৈরি করতে হবে যা ফেসবুকের লিংক প্রসেস করবে।
+        downloadForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // ফর্ম সাবমিট হওয়া থেকে বিরত রাখে
+
+            const videoUrl = videoUrlInput.value.trim();
+            if (videoUrl === '') {
+                alert('অনুগ্রহ করে একটি ফেসবুক ভিডিও লিংক দিন।');
+                return;
+            }
+
+            // আগের রেজাল্ট হাইড করুন
+            resultDiv.style.display = 'none';
+            // লোডিং স্পিনার দেখান
+            loadingDiv.style.display = 'block';
+
+            // *** একটি ব্যাকএন্ড API কল সিমুলেট করা হচ্ছে ***
+            // বাস্তব প্রজেক্টে, আপনি এখানে fetch() ব্যবহার করে আপনার সার্ভারে রিকোয়েস্ট পাঠাবেন।
+            // সার্ভার ফেসবুক ভিডিওর তথ্য (টাইটেল, থাম্বনেইল, ডাউনলোড লিংক) ফেরত পাঠাবে।
+            setTimeout(() => {
+                // লোডিং স্পিনার হাইড করুন
+                loadingDiv.style.display = 'none';
+
+                // ডেমো ডেটা দিয়ে রেজাল্ট দেখান
+                document.getElementById('video-thumbnail').src = 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'; // ডেমো থাম্বনেইল
+                document.getElementById('video-title').textContent = 'এটি একটি ডেমো ভিডিও টাইটেল। আসল টাইটেল ব্যাকএন্ড থেকে আসবে।';
+                
+                // ডেমো ডাউনলোড লিংক
+                document.getElementById('download-sd').href = '#'; 
+                document.getElementById('download-hd').href = '#'; 
+                
+                // রেজাল্ সেকশনটি দেখান
+                resultDiv.style.display = 'block';
+
+            }, 2500); // ২.৫ সেকেন্ডের ডেমো লোডিং
+        });
+    </script>
 </body>
-                        </html>
+    </html>vercel.jsonvercel.jsonvercel.jsonvercel.jsonvercel.jso
