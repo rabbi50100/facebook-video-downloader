@@ -1,13 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-    <title>Facebook Video Downloader</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ফেসবুক ভিডিও ডাউনলোডার</title>
+    <!-- স্টাইলশীট লিংক -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome আইকন এর জন্য -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h1>Facebook Video Downloader</h1>
-    <form action="/api/download" method="GET">
-        <input type="text" name="url" placeholder="Enter Facebook Video URL" required>
-        <button type="submit">Download</button>
-    </form>
+
+    <div class="container">
+        <header>
+            <h1><i class="fab fa-facebook"></i> ফেসবুক ভিডিও ডাউনলোডার</h1>
+            <p>আপনার পছন্দের ফেসবুক ভিডিও ডাউনলোড করুন সহজেই।</p>
+        </header>
+
+        <main>
+            <form id="download-form">
+                <div class="input-group">
+                    <input type="url" id="video-url" placeholder="এখানে ফেসবুক ভিডিওর লিংক পেস্ট করুন..." required>
+                    <button type="submit" id="download-btn">
+                        <span class="btn-text">ডাউনলোড</span>
+                        <span class="loader" style="display: none;"></span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- এখানে ডাউনলোডের ফলাফল দেখানো হবে -->
+            <div id="result" class="hidden">
+                <div class="video-info">
+                    <img id="video-thumbnail" src="https://via.placeholder.com/150" alt="Video Thumbnail">
+                    <h3 id="video-title">ভিডিওর টাইটেল এখানে আসবে...</h3>
+                </div>
+                <div class="download-links">
+                    <p>ডাউনলোড অপশন:</p>
+                    <a href="#" class="download-link" download>
+                        <i class="fas fa-download"></i> HD কোয়ালিটি (720p)
+                    </a>
+                    <a href="#" class="download-link" download>
+                        <i class="fas fa-download"></i> SD কোয়ালিটি (360p)
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- জাভাস্ক্রিপ্ট ফাইল লিংক -->
+    <script src="script.js"></script>
 </body>
-</html>
+                        </html>
