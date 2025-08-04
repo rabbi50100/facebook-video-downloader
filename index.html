@@ -1,4 +1,4 @@
-h<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -299,11 +299,11 @@ h<!DOCTYPE html>
         const videoUrlInput = document.getElementById('video-url');
         const loadingDiv = document.getElementById('loading');
         const resultDiv = document.getElementById('result');
+        const downloadSdLink = document.getElementById('download-sd');
+        const downloadHdLink = document.getElementById('download-hd');
 
-        // এই কোডটি শুধুমাত্র ফ্রন্টএন্ড ডেমোর জন্য।
-        // বাস্তব জীবনে, আপনাকে একটি ব্যাকএন্ড তৈরি করতে হবে যা ফেসবুকের লিংক প্রসেস করবে।
-        downloadForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // ফর্ম সাবমিট হওয়া থেকে বিরত রাখে
+        downloadForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
 
             const videoUrl = videoUrlInput.value.trim();
             if (videoUrl === '') {
@@ -311,31 +311,57 @@ h<!DOCTYPE html>
                 return;
             }
 
-            // আগের রেজাল্ট হাইড করুন
             resultDiv.style.display = 'none';
-            // লোডিং স্পিনার দেখান
             loadingDiv.style.display = 'block';
 
-            // *** একটি ব্যাকএন্ড API কল সিমুলেট করা হচ্ছে ***
-            // বাস্তব প্রজেক্টে, আপনি এখানে fetch() ব্যবহার করে আপনার সার্ভারে রিকোয়েস্ট পাঠাবেন।
-            // সার্ভার ফেসবুক ভিডিওর তথ্য (টাইটেল, থাম্বনেইল, ডাউনলোড লিংক) ফেরত পাঠাবে।
-            setTimeout(() => {
-                // লোডিং স্পিনার হাইড করুন
-                loadingDiv.style.display = 'none';
+            // আপনার নতুন এবং স্থায়ী ব্যাকএন্ড সার্ভারের ঠিকানা
+            const backendAPI = 'https://video-downloader-backend-pnwa.onrender.com/api/getVideoInfo';
 
-                // ডেমো ডেটা দিয়ে রেজাল্ট দেখান
-                document.getElementById('video-thumbnail').src = 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'; // ডেমো থাম্বনেইল
-                document.getElementById('video-title').textContent = 'এটি একটি ডেমো ভিডিও টাইটেল। আসল টাইটেল ব্যাকএন্ড থেকে আসবে।';
+            try {
+                const response = await fetch(backendAPI, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: videoUrl }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'সার্ভার থেকে তথ্য আনা সম্ভব হয়নি।');
+                }
+
+                const data = await response.json();
+
+                document.getElementById('video-thumbnail').src = data.thumbnail;
+                document.getElementById('video-title').textContent = data.title;
                 
-                // ডেমো ডাউনলোড লিংক
-                document.getElementById('download-sd').href = '#'; 
-                document.getElementById('download-hd').href = '#'; 
+                const sdFormat = data.formats.find(f => f.resolution && f.resolution.includes('360'));
+                const hdFormat = data.formats.find(f => f.resolution && f.resolution.includes('720'));
+
+                if (sdFormat) {
+                    downloadSdLink.href = sdFormat.url;
+                    downloadSdLink.style.display = 'inline-block';
+                } else {
+                    downloadSdLink.style.display = 'none';
+                }
                 
-                // রেজাল্ সেকশনটি দেখান
+                if (hdFormat) {
+                    downloadHdLink.href = hdFormat.url;
+                    downloadHdLink.style.display = 'inline-block';
+                } else {
+                    downloadHdLink.style.display = 'none';
+                }
+
                 resultDiv.style.display = 'block';
 
-            }, 2500); // ২.৫ সেকেন্ডের ডেমো লোডিং
+            } catch (error) {
+                console.error('Error:', error);
+                alert('একটি সমস্যা হয়েছে: ' + error.message);
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
         });
     </script>
 </body>
-    </html>vercel.jsonvercel.jsonvercel.jsonvercel.jsonvercel.jso
+    </html>
